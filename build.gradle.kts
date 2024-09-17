@@ -4,12 +4,19 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
     id("java") // Java support
-    alias(libs.plugins.kotlin) // Kotlin support
-    alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
+    id("org.jetbrains.intellij.platform") version "2.0.1"
+    kotlin("jvm")
 }
+
+dependencies {
+    implementation("io.github.ollama4j:ollama4j:1.0.79")
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("com.intuit.fuzzymatcher:fuzzy-matcher:1.2.1")
+}
+
 
 group = providers.gradleProperty("pluginGroup").get()
 version = providers.gradleProperty("pluginVersion").get()

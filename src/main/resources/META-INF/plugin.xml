@@ -9,10 +9,18 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.gearfifth.intellijautocompleteplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="intellijautocompleteplugin.toolWindow.SampleToolWindowFactory" id="Sample Calendar"/>
+        <typedHandler implementation="intellijautocompleteplugin.handlers.TypedHandler"/>
+<!--        <completion.contributor language="JAVA"-->
+<!--                                implementationClass="intellijautocompleteplugin.completion.SimpleCompletionContributor"/>-->
+        <inline.completion.provider id="intellijautocompleteplugin.SuggestionsProvider"
+                                    implementation="intellijautocompleteplugin.SuggestionsProvider"/>
+
+
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.gearfifth.intellijautocompleteplugin.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+
+
+
+
 </idea-plugin>
