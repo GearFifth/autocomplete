@@ -6,7 +6,11 @@
 
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <description>
+        <![CDATA[
+      Enhance your coding experience with Autocomplete,
+    ]]>
+    </description>
 
     <extensions defaultExtensionNs="com.intellij">
         <inline.completion.provider id="intellijautocompleteplugin.SuggestionsProvider"

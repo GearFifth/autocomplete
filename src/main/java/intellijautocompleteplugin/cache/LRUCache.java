@@ -1,4 +1,4 @@
-package intellijautocompleteplugin.utils;
+package intellijautocompleteplugin.cache;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -19,23 +19,23 @@ public class LRUCache<K, V> {
         };
     }
 
-    public V get(K key) {
+    public synchronized  V get(K key) {
         return cache.getOrDefault(key, null);
     }
 
-    public void put(K key, V value) {
+    public synchronized void put(K key, V value) {
         cache.put(key, value);
     }
 
-    public boolean containsKey(K key) {
+    public synchronized boolean containsKey(K key) {
         return cache.containsKey(key);
     }
 
-    public Collection<K> keySet() {
+    public synchronized Collection<K> keySet() {
         return cache.keySet();
     }
 
-    public Set<Map.Entry<K, V>> entrySet() {
+    public synchronized Set<Map.Entry<K, V>> entrySet() {
         return cache.entrySet();
     }
 }

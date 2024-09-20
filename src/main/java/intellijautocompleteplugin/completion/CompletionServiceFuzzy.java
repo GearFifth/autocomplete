@@ -7,7 +7,7 @@ import com.intuit.fuzzymatcher.domain.Element;
 import com.intuit.fuzzymatcher.domain.ElementType;
 import com.intuit.fuzzymatcher.domain.Match;
 import intellijautocompleteplugin.ollama.OllamaClient;
-import intellijautocompleteplugin.utils.LRUCache;
+import intellijautocompleteplugin.cache.LRUCache;
 import io.github.ollama4j.exceptions.OllamaBaseException;
 import org.jetbrains.annotations.NotNull;
 

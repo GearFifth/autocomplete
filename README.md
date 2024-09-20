@@ -1,5 +1,9 @@
 # intellij-autocomplete-plugin
 
+<!-- Plugin description -->
+IntelliJ Autocomplete Plugin is a handy tool for enhancing your coding experience by providing code suggestions within the IntelliJ IDEA IDE.
+<!-- Plugin description end -->
+
 ## Download Ollama Model
 To use an Ollama model in this project, follow these steps:
 

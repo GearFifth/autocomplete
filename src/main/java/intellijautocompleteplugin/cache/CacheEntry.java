@@ -1,4 +1,4 @@
-package intellijautocompleteplugin.utils;
+package intellijautocompleteplugin.cache;
 
 public class CacheEntry {
     private final String value;

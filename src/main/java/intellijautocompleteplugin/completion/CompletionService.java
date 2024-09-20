@@ -2,13 +2,13 @@ package intellijautocompleteplugin.completion;
 
 import com.intellij.codeInsight.inline.completion.InlineCompletionRequest;
 import intellijautocompleteplugin.ollama.OllamaClient;
-import intellijautocompleteplugin.utils.CacheEntry;
-import intellijautocompleteplugin.utils.LRUCache;
+import intellijautocompleteplugin.cache.CacheEntry;
+import intellijautocompleteplugin.cache.LRUCache;
 import io.github.ollama4j.exceptions.OllamaBaseException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+
 
 public class CompletionService {
 
@@ -19,6 +19,12 @@ public class CompletionService {
     private static final LRUCache<String, CacheEntry> completionCache = new LRUCache<>(CACHE_CAPACITY);
     private static final int WINDOW = 100;
 
+    /**
+     * Fetches completion suggestions based on the current inline request.
+     *
+     * @param request The request containing the current state of the document and caret.
+     * @return A list of completion suggestions.
+     */
     public static List<String> getCompletion(@NotNull InlineCompletionRequest request) {
         List<String> suggestions = new ArrayList<>();
         String codeBeforeCaret = getCodeBeforeCaret(request);
@@ -78,6 +84,12 @@ public class CompletionService {
     }
 
 
+    /**
+     * Searches for the best matching cached completion for the current word.
+     *
+     * @param currentWord The word to find a match for.
+     * @return An optional containing the best match from the cache.
+     */
     private static Optional<String> findMatch(String currentWord) {
         List<String> cachedKeys = new ArrayList<>(completionCache.keySet());
 
@@ -100,6 +112,14 @@ public class CompletionService {
         return Optional.empty();
     }
 
+    /**
+     * Fetches a completion suggestion from the AI model and adds it to the list of suggestions.
+     * The result is also cached for future use.
+     *
+     * @param codeBeforeCaret The code before the caret position.
+     * @param currentWord The current word being completed.
+     * @param suggestions The list of suggestions to be returned.
+     */
     private static void fetchCompletionFromAI(String codeBeforeCaret, String currentWord, List<String> suggestions) {
         try {
             String query = formQuery(codeBeforeCaret);
