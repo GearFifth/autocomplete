@@ -1,7 +1,7 @@
-# intellij-autocomplete-plugin
+# Intellij Autocomplete Plugin
 
 <!-- Plugin description -->
-IntelliJ Autocomplete Plugin is a handy tool for enhancing your coding experience by providing code suggestions within the IntelliJ IDEA IDE.
+The IntelliJ Autocomplete Plugin enhances your coding experience by providing AI-powered code suggestions within IntelliJ IDEA using a local Ollama model.
 <!-- Plugin description end -->
 
 ## Download Ollama Model
@@ -15,5 +15,39 @@ To use an Ollama model in this project, follow these steps:
 ollama pull gemma2
 ```
 
-
 3. You can choose any model, but if you use a different one, make sure to update the model name in the `OllamaClient` class accordingly.
+
+4. Run the Ollama model using:
+```bash
+ollama start gemma2
+```
+
+## Example usage
+### Example 1: Java Code Completion
+
+```java
+public class Example {
+    public static void main(String[] args) {
+    // Start typing "System.o"
+    System.o
+    // Completion: "ut.println();" is suggested
+    }
+}
+```
+
+### Example 2: Kotlin Code Completion
+
+```kotlin
+fun main() {
+    val name = "Kotlin"
+    // Start typing "println("
+    println(
+    // Completion: "name)" is suggested
+}
+```
+
+### Caching Example
+The plugin caches suggestions to improve performance. Here’s how it works:
+
+1. When you type `System.o`, the plugin fetches the completion `System.out.println();` from the AI model.
+2. If you type `System.o` or any <b>substring</b> again, the plugin serves the cached suggestion instantly, avoiding another AI query.
