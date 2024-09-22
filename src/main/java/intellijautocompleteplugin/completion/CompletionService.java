@@ -12,12 +12,21 @@ import java.util.*;
 
 public class CompletionService {
 
-    private static final OllamaClient ollamaClient = new OllamaClient();
-    private static final int CACHE_CAPACITY = 20;
+    private final OllamaClient ollamaClient;
+    private final LRUCache<String, CacheEntry> completionCache;
+    private final int CACHE_CAPACITY = 20;
+    public final int CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+    private final int WINDOW = 100;
 
-    private static final int CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-    private static final LRUCache<String, CacheEntry> completionCache = new LRUCache<>(CACHE_CAPACITY);
-    private static final int WINDOW = 100;
+    public CompletionService() {
+        this.ollamaClient = new OllamaClient();
+        this.completionCache = new LRUCache<>(CACHE_CAPACITY);
+    }
+
+    public CompletionService(OllamaClient ollamaClient, LRUCache<String, CacheEntry> completionCache) {
+        this.ollamaClient = ollamaClient;
+        this.completionCache = completionCache;
+    }
 
     /**
      * Fetches completion suggestions based on the current inline request.
@@ -25,7 +34,7 @@ public class CompletionService {
      * @param request The request containing the current state of the document and caret.
      * @return A list of completion suggestions.
      */
-    public static List<String> getCompletion(@NotNull InlineCompletionRequest request) {
+    public List<String> getCompletion(@NotNull InlineCompletionRequest request) {
         List<String> suggestions = new ArrayList<>();
         String codeBeforeCaret = getCodeBeforeCaret(request);
         char lastChar = codeBeforeCaret.charAt(codeBeforeCaret.length()-1);
@@ -58,14 +67,24 @@ public class CompletionService {
 
     }
 
-    private static String formatSuggestion(String suggestion, String currentWord){
-        if(suggestion.startsWith(currentWord)){
-            return suggestion.substring(currentWord.length());
+//    private String formatSuggestion(String suggestion, String currentWord){
+//        if(suggestion.startsWith(currentWord)){
+//            return suggestion.substring(currentWord.length());
+//        }
+//        return suggestion;
+//    }
+
+    private String formatSuggestion(String suggestion, String prefix) {
+        for (int i = 0; i < prefix.length(); i++) {
+            String trimmedPrefix = prefix.substring(i);
+            if (suggestion.startsWith(trimmedPrefix)) {
+                return suggestion.substring(trimmedPrefix.length());
+            }
         }
         return suggestion;
     }
 
-    private static String formQuery(String codeBeforeCaret) {
+    private String formQuery(String codeBeforeCaret) {
         return String.format(
                 """
                 Suggest the inline completion at the caret position. Please return only the suggestion without any additional text or explanation.
@@ -75,7 +94,7 @@ public class CompletionService {
         );
     }
 
-    private static String getCodeBeforeCaret(@NotNull InlineCompletionRequest request) {
+    private String getCodeBeforeCaret(@NotNull InlineCompletionRequest request) {
         com.intellij.openapi.editor.Document document = request.getDocument();
         int caretOffset = request.getStartOffset() + 1;
         String code = document.getText();
@@ -90,7 +109,7 @@ public class CompletionService {
      * @param currentWord The word to find a match for.
      * @return An optional containing the best match from the cache.
      */
-    private static Optional<String> findMatch(String currentWord) {
+    private Optional<String> findMatch(String currentWord) {
         List<String> cachedKeys = new ArrayList<>(completionCache.keySet());
 
         for (String key : cachedKeys){
@@ -120,12 +139,12 @@ public class CompletionService {
      * @param currentWord The current word being completed.
      * @param suggestions The list of suggestions to be returned.
      */
-    private static void fetchCompletionFromAI(String codeBeforeCaret, String currentWord, List<String> suggestions) {
+    private void fetchCompletionFromAI(String codeBeforeCaret, String currentWord, List<String> suggestions) {
         try {
             String query = formQuery(codeBeforeCaret);
-            System.out.println("Query: " + query);
+//            System.out.println("Query: " + query);
             String aiCompletion = ollamaClient.sendQuery(query);
-            System.out.println("AI Completion: " + aiCompletion);
+//            System.out.println("AI Completion: " + aiCompletion);
             String suggestion = formatSuggestion(aiCompletion, currentWord);
             suggestions.add(suggestion);
 
@@ -136,7 +155,7 @@ public class CompletionService {
         }
     }
 
-    public static String getLastSubstringWithoutWhitespaces(String input) {
+    public String getLastSubstringWithoutWhitespaces(String input) {
         input = input.trim();
 
         String[] parts = input.split("\\s+");
@@ -147,5 +166,7 @@ public class CompletionService {
         return "";
     }
 
-
+    public int getCacheTTL(){
+        return CACHE_TTL;
+    }
 }

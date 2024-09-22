@@ -17,8 +17,10 @@ public class SuggestionsProvider : DebouncedInlineCompletionProvider() {
 
     override suspend fun getSuggestionDebounced(request: InlineCompletionRequest): InlineCompletionSuggestion {
 
+        val completionService = CompletionService()
+
         val elements = coroutineToIndicator {
-            CompletionService.getCompletion(request)
+            completionService.getCompletion(request)
         } ?: return InlineCompletionSuggestion.empty()
 
         return InlineCompletionSuggestion.withFlow {

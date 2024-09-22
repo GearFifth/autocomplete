@@ -11,10 +11,14 @@ plugins {
     kotlin("jvm")
 }
 
+
 dependencies {
     implementation("io.github.ollama4j:ollama4j:1.0.79")
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.intuit.fuzzymatcher:fuzzy-matcher:1.2.1")
+    testImplementation("org.mockito:mockito-core:5.13.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.11.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
 }
 
 
@@ -160,5 +164,11 @@ intellijPlatformTesting {
                 robotServerPlugin()
             }
         }
+    }
+}
+
+tasks {
+    "test"(Test::class) {
+        useJUnitPlatform()
     }
 }
