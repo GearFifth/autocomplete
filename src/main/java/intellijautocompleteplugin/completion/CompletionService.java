@@ -1,6 +1,7 @@
 package intellijautocompleteplugin.completion;
 
 import com.intellij.codeInsight.inline.completion.InlineCompletionRequest;
+import intellijautocompleteplugin.cache.CompletionCache;
 import intellijautocompleteplugin.ollama.OllamaClient;
 import intellijautocompleteplugin.cache.CacheEntry;
 import intellijautocompleteplugin.cache.LRUCache;
@@ -13,19 +14,14 @@ import java.util.*;
 public class CompletionService {
 
     private final OllamaClient ollamaClient;
-    private final LRUCache<String, CacheEntry> completionCache;
-    private final int CACHE_CAPACITY = 20;
-    public final int CACHE_TTL = 10 * 60 * 1000; // 10 minutes
     private final int WINDOW = 100;
 
     public CompletionService() {
         this.ollamaClient = new OllamaClient();
-        this.completionCache = new LRUCache<>(CACHE_CAPACITY);
     }
 
-    public CompletionService(OllamaClient ollamaClient, LRUCache<String, CacheEntry> completionCache) {
+    public CompletionService(OllamaClient ollamaClient) {
         this.ollamaClient = ollamaClient;
-        this.completionCache = completionCache;
     }
 
     /**
@@ -48,10 +44,9 @@ public class CompletionService {
         }
 
         if (bestMatch.isPresent()) {
-            CacheEntry cacheEntry = completionCache.get(bestMatch.get());
+            CacheEntry cacheEntry = CompletionCache.get(bestMatch.get()).orElse(null);
 
-            boolean isExpired = System.currentTimeMillis() - cacheEntry.getTimestamp() > CACHE_TTL;
-            if (!isExpired) {
+            if (cacheEntry != null && !CompletionCache.isExpired(cacheEntry)) {
                 String suggestion = formatSuggestion(cacheEntry.getValue(), currentWord);
                 suggestions.add(suggestion);
                 return suggestions;
@@ -110,7 +105,7 @@ public class CompletionService {
      * @return An optional containing the best match from the cache.
      */
     private Optional<String> findMatch(String currentWord) {
-        List<String> cachedKeys = new ArrayList<>(completionCache.keySet());
+        List<String> cachedKeys = new ArrayList<>(CompletionCache.getKeySet());
 
         for (String key : cachedKeys){
             int minLen = Math.min(currentWord.length(), key.length());
@@ -142,14 +137,14 @@ public class CompletionService {
     private void fetchCompletionFromAI(String codeBeforeCaret, String currentWord, List<String> suggestions) {
         try {
             String query = formQuery(codeBeforeCaret);
-//            System.out.println("Query: " + query);
+            System.out.println("Query: " + query);
             String aiCompletion = ollamaClient.sendQuery(query);
-//            System.out.println("AI Completion: " + aiCompletion);
+            System.out.println("AI Completion: " + aiCompletion);
             String suggestion = formatSuggestion(aiCompletion, currentWord);
             suggestions.add(suggestion);
 
             CacheEntry cacheEntry = new CacheEntry(currentWord + suggestion, System.currentTimeMillis());
-            completionCache.put(currentWord, cacheEntry);
+            CompletionCache.put(currentWord, cacheEntry);
         } catch (InterruptedException | OllamaBaseException e) {
             e.printStackTrace();
         }
@@ -166,7 +161,4 @@ public class CompletionService {
         return "";
     }
 
-    public int getCacheTTL(){
-        return CACHE_TTL;
-    }
 }

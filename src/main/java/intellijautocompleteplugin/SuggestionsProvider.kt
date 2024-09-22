@@ -1,6 +1,5 @@
 package intellijautocompleteplugin
 
-import com.gitlab.plugin.codesuggestions.render.UpdatableInlineCompletionGrayElement
 import com.intellij.codeInsight.inline.completion.*
 import com.intellij.openapi.progress.coroutineToIndicator
 import intellijautocompleteplugin.completion.CompletionService
@@ -8,6 +7,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import com.intellij.codeInsight.inline.completion.elements.InlineCompletionGrayTextElement
 
 val DEBOUNCE_DELAY = 1000.milliseconds
 
@@ -27,7 +27,7 @@ public class SuggestionsProvider : DebouncedInlineCompletionProvider() {
             val flowElements: Flow<String> = elements.asFlow()
 
             flowElements.collect { suggestion ->
-                val inlineElement = UpdatableInlineCompletionGrayElement(suggestion, request.editor)
+                val inlineElement = InlineCompletionGrayTextElement(suggestion)
                 emit(inlineElement)
             }
         }
