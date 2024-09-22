@@ -13,7 +13,7 @@ plugins {
 
 
 dependencies {
-    implementation("io.github.ollama4j:ollama4j:1.0.79")
+    implementation("io.github.ollama4j:ollama4j:1.0.84")
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.intuit.fuzzymatcher:fuzzy-matcher:1.2.1")
     testImplementation("org.mockito:mockito-core:5.13.0")
