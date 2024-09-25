@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
-    id("org.jetbrains.intellij.platform") version "2.0.1"
+    id("org.jetbrains.intellij.platform") version "2.1.0"
     kotlin("jvm")
 }
 
